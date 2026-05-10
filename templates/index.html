@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exam Seating System</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="logo">Exam<span>Seat</span></div>
+      <div class="tagline">Anti-Cheat Seating Arrangement System</div>
+    </header>
+
+    <div class="container">
+      {% if error %}
+      <div class="alert alert-error">{{ error }}</div>
+      {% endif %}
+
+      <div class="card">
+        <div class="page-title">Generate Seating Plan</div>
+        <div class="page-sub">
+          {% if strategy == "same_exam" %} Mode: <strong>Same Exam</strong> —
+          Checkerboard pattern, empty seats on all 4 sides {% else %} Mode:
+          <strong>Multi Group</strong> — Same branch+year students never sit
+          adjacent {% endif %} &nbsp;·&nbsp;
+          <small style="color: var(--muted)"
+            >Change STRATEGY in seating.py to switch</small
+          >
+        </div>
+
+        <form action="/generate" method="post" enctype="multipart/form-data">
+          <div class="form-group">
+            <label>Exam / Hall Name</label>
+            <input
+              type="text"
+              name="exam_name"
+              placeholder="e.g. Engineering Maths — Hall A"
+              required
+            />
+          </div>
+
+          <div class="row-2">
+            <div class="form-group">
+              <label>Number of Rows</label>
+              <input
+                type="number"
+                name="rows"
+                min="1"
+                max="30"
+                value="5"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>Seats per Row (Columns)</label>
+              <input
+                type="number"
+                name="cols"
+                min="1"
+                max="20"
+                value="6"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Student List (CSV)</label>
+            <div class="upload-zone" id="dropzone">
+              <input
+                type="file"
+                name="file"
+                accept=".csv"
+                id="file-input"
+                required
+              />
+              <div class="upload-icon">📄</div>
+              <p><strong>Click to upload</strong> or drag & drop</p>
+              <div id="file-name"></div>
+            </div>
+            <div class="csv-hint">
+              Required columns: &nbsp;<strong>name</strong>,
+              &nbsp;<strong>roll</strong>, &nbsp;<strong>branch</strong>,
+              &nbsp;<strong>year</strong><br />
+              Example: &nbsp; Amit Sharma, 101, CSE, 1<br />
+              Example: &nbsp; Priya Singh, 201, ECE, 2
+            </div>
+          </div>
+
+          <div style="margin-bottom: 16px">
+            <a href="/sample-csv" class="btn btn-outline btn-sm"
+              >Download Sample CSV</a
+            >
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            Generate Seating Plan
+          </button>
+        </form>
+      </div>
+
+      <div
+        style="
+          margin-top: 24px;
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 14px;
+        "
+      >
+        <div class="card" style="padding: 18px; text-align: center">
+          <div style="font-size: 28px; margin-bottom: 8px">📥</div>
+          <div style="font-weight: 600; margin-bottom: 4px">Upload CSV</div>
+          <div style="font-size: 13px; color: var(--muted)">
+            name, roll, branch, year
+          </div>
+        </div>
+        <div class="card" style="padding: 18px; text-align: center">
+          <div style="font-size: 28px; margin-bottom: 8px">🧠</div>
+          <div style="font-weight: 600; margin-bottom: 4px">Auto Arrange</div>
+          <div style="font-size: 13px; color: var(--muted)">
+            Same branch+year never adjacent
+          </div>
+        </div>
+        <div class="card" style="padding: 18px; text-align: center">
+          <div style="font-size: 28px; margin-bottom: 8px">🖨️</div>
+          <div style="font-weight: 600; margin-bottom: 4px">Export PDF</div>
+          <div style="font-size: 13px; color: var(--muted)">
+            Print for notice board
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const input = document.getElementById("file-input");
+      const label = document.getElementById("file-name");
+      const zone = document.getElementById("dropzone");
+      input.addEventListener("change", () => {
+        label.textContent = input.files[0]?.name || "";
+      });
+      zone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        zone.classList.add("dragover");
+      });
+      zone.addEventListener("dragleave", () =>
+        zone.classList.remove("dragover"),
+      );
+      zone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        zone.classList.remove("dragover");
+        if (e.dataTransfer.files[0]) {
+          const dt = new DataTransfer();
+          dt.items.add(e.dataTransfer.files[0]);
+          input.files = dt.files;
+          label.textContent = e.dataTransfer.files[0].name;
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -41,7 +41,7 @@ exam_seatingPlan/
 │   └── result.html      # Seating grid display
 ├── static/
 │   └── style.css        # Styling
-└── requirements.txt     # Python dependencies
+└── requirement.txt     # Python dependencies
 ```
 
 ---
@@ -50,7 +50,7 @@ exam_seatingPlan/
 
 ### 1. Install dependencies
 ```bash
-pip install -r requirements.txt
+pip install -r requirement.txt
 ```
 
 ### 2. Start the server
